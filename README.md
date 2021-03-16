@@ -1,4 +1,4 @@
-<p> <img src="/image/met_office_logo.png"> </p>
+<p> <img src="/images/met_office_logo.png"> </p>
 #  Hackathon-2021 
 
 
