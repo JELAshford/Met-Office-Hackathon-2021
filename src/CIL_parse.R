@@ -34,7 +34,7 @@ for (sheet in cil.sheets) {
     # Read in data for this sheet
     cli.data <- as_tibble(read.xlsx("rsc/CIL_World.xlsx", sheet=sheet))
     colnames(cli.data) <- column_names
-    # Data always starts two rows above the name-row, and there's a one row separator
+    # Data always starts two rows above the name-row, with a one-row separator
     start_8.5_row <- which(cli.data[,1] == "RCP 8.5")
     start_4.5_row <- which(cli.data[,1] == "RCP 4.5")
     # Get individual models
@@ -52,6 +52,5 @@ for (sheet in cil.sheets) {
 
 # Upload the data
 ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
-# Rewrite data in a sheet
 sheet_write(all_8.5, ss, sheet="RCP 8.5")
 sheet_write(all_4.5, ss, sheet="RCP 4.5")
