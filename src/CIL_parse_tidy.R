@@ -8,25 +8,10 @@ extract.medians <- function(model.data, val.name) {
     out <- model.data %>%
         select(Country, contains("median")) %>%
         rename_with(function(x) {str_remove(x, "_median")}, contains("median")) %>%
-        gather(`1986`:`2080`, key="year", value="value")
+        gather(`1986`:`2080`, key="Year", value="value")
     colnames(out)[3] <- val.name
     return(out)
 }
-
-combine.clean.countries <- function(data.list) {
-    data.list %>%
-        reduce(full_join, by=c("Country", "year")) %>%
-        select(Country...1, contains("median")) %>%
-        rename(Country = Country...1)
-}
-
-cil.sheets = c(
-    "Temp - Summer Average",
-    "Temp - Winter Average",
-    "Temp - Max >95F",
-    "Temp - Min <32F",
-    "Damages - Mortality"
-)
 
 column_names = c(
     "Country",
@@ -42,12 +27,11 @@ column_names = c(
     "2080_upper20th"
 )
 
-# Read in the CIL world data
-
+cil.sheets = getSheetNames("rsc/CIL_World.xlsx")
 
 # Storage
-all_8.5 <- list()
-all_4.5 <- list()
+all_8.5 <- NULL
+all_4.5 <- NULL
 # Iterate over the sheets
 # sheet = cil.sheets[1]
 for (sheet in cil.sheets) {
@@ -55,32 +39,30 @@ for (sheet in cil.sheets) {
     # Read in cli data, at this sheet
     cli.data <- as_tibble(read.xlsx("rsc/CIL_World.xlsx", sheet=sheet))
     colnames(cli.data) <- column_names
-
     # Data always starts two rows above the name-row, and there's a one row separator
     start_8.5_row <- which(cli.data[,1] == "RCP 8.5")
     start_4.5_row <- which(cli.data[,1] == "RCP 4.5")
     # Get individual models
     rcp_8.5 <- cli.data[(start_8.5_row+2):(start_4.5_row-3),]
     rcp_4.5 <- cli.data[(start_4.5_row+2):nrow(cli.data),]
-
-
-    # For each model: extract the medians, rename, and add to storage
-    all_8.5 <- c(all_8.5, extract.medians(rcp_8.5, val.name=sheet))
-    all_4.5 <- c(all_4.5, extract.medians(rcp_4.5, val.name=sheet))
+    # For each model: extract the medians, reshape, and add to storage
+    medians_8.5 <- extract.medians(rcp_8.5, val.name=sheet)
+    medians_4.5 <- extract.medians(rcp_4.5, val.name=sheet)
+    if (is.null(all_8.5)) {
+        all_8.5 <- medians_8.5
+        all_4.5 <- medians_4.5
+    } else {
+        all_8.5 <- left_join(all_8.5, medians_8.5, by=c("Country", "Year"))
+        all_4.5 <- left_join(all_4.5, medians_4.5, by=c("Country", "Year"))
+    }
 }
 
-all_8.5 %>%
-    reduce(full_join, by=c(Country, year))
+# Finish Tidy - gather by data type
+final_8.5 <- gather(all_8.5, -c(Country, Year), key="Type", value="Value")
+final_4.5 <- gather(all_4.5, -c(Country, Year), key="Type", value="Value")
 
-
-# # Combine all the data, remove duplicate countries, and gather
-# final_8.5 <- combine.clean.countries(all_8.5)
-# final_4.5 <- combine.clean.countries(all_4.5)
-
-# # Upload the data
-# ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
-# # Rewrite data in a sheet
-# final_8.5 %>%
-#     sheet_write(ss, sheet="RCP 8.5")
-# final_4.5 %>%
-#     sheet_write(ss, sheet="RCP 4.5")
+# Upload the data
+ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
+# Rewrite data in a sheet
+sheet_write(final_8.5, ss, sheet="RCP 8.5")
+sheet_write(final_4.5, ss, sheet="RCP 4.5")

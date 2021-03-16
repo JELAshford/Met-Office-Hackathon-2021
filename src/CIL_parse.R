@@ -3,7 +3,6 @@ library(googlesheets4)
 library(googledrive)
 library(tidyverse)
 library(openxlsx)
-# library(xlsx)
 
 extract.medians <- function(model.data) {
     model.data %>%
@@ -48,7 +47,6 @@ for (sheet in cil.sheets) {
     } else {
         all_8.5 <- left_join(all_8.5, extract.medians(rcp_8.5), by="Country")
         all_4.5 <- left_join(all_4.5, extract.medians(rcp_4.5), by="Country")
-
     }
 }
 
