@@ -4,6 +4,18 @@ library(googledrive)
 library(tidyverse)
 library(openxlsx)
 
+extract.sources <- function(s) {
+    # Get data for this country
+    country.data <- eia.data[s:(s+13),]
+    colnames(country.data) <- c("Type", 1980:2019)
+    # Keep only the columns that are of interest
+    out <- country.data %>%
+        filter(str_detect(Type, "Geothermal|Nuclear|Fossil fuels")) %>%
+        mutate(Type = str_remove_all(Type, "    ")) %>%
+        mutate(Country = country.data$Type[1]) %>%
+        relocate(Country)
+}
+
 FILE = "rsc/US_EIA_Capacity.xlsx"
 
 # Read in the file
@@ -13,14 +25,4 @@ eia.data <- as_tibble(read.xlsx(FILE, sheet=eia.sheets[1])) %>%
 
 # First filter: remove filler lines and expand first column
 start <- which(!str_detect(eia.data$X2, "    "))
-for (s in start) {
-    country.data <- eia.data[s:(s+13),]
-    print(this)    
-}
-
-
-out <- eia.data %>% 
-    filter(!str_detect(X2, "    "))
-
-    filter(str_detect(X2, "Geothermal|Nuclear|Fossil fuels")) %>%
-    mutate(X2 = str_remove_all(X2, "    "))
+wanted_data <- bind_rows(map(start, extract.sources))
