@@ -1,6 +1,6 @@
-<p> <img src="/images/met_office_logo.png"> </p>
-#  Hackathon-2021 
+<p> <img src="/images/met_office_logo.png" width="50" height="50"> </p> 
 
+# Met Office Hackathon: 2021 
 
 Public repository for processing code developed during the Met Office Data Hackathon 2021
 <p align = "center">
