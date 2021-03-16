@@ -1,6 +1,5 @@
 # Initial data processing and loading testing
 library(tidyverse)
-library(openxlsx) # read.xlsx(, sheet = 1, startRow=, ) https://www.rdocumentation.org/packages/openxlsx/versions/4.2.3/topics/read.xlsx
 
 # Goals of interest
 # goal = "Energy intensity level of primary energy (MJ/$2011 PPP GDP)"
