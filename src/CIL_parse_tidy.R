@@ -68,7 +68,7 @@ final_4.5 <- gather(all_4.5, -c(Country, Year), key="Type", value="Value")
 final_values <- gather(all_values, -c(Country, Year, RCP), key="Type", value="Value")
 
 # Upload the data
-ss <- drive_get("Met Office Hackathon 2021/Sheets Testing v0")
+ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
 # sheet_write(final_8.5, ss, sheet="RCP 8.5")
 # sheet_write(final_4.5, ss, sheet="RCP 4.5")
 sheet_write(final_values, ss, sheet="Combined RCP")
