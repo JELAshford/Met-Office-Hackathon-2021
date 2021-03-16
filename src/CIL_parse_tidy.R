@@ -32,6 +32,7 @@ cil.sheets = getSheetNames("rsc/CIL_World.xlsx")
 # Storage
 all_8.5 <- NULL
 all_4.5 <- NULL
+all_values <- NULL
 # Iterate over the sheets
 for (sheet in cil.sheets) {
     # Read in cli data, at this sheet
@@ -46,19 +47,28 @@ for (sheet in cil.sheets) {
     # For each model: extract the medians, reshape, and add to storage
     medians_8.5 <- extract.medians(rcp_8.5, val.name=sheet)
     medians_4.5 <- extract.medians(rcp_4.5, val.name=sheet)
+    # Combine
+    medians <- bind_rows(
+        mutate(medians_8.5, RCP = "RCP85"),
+        mutate(medians_4.5, RCP = "RCP45")
+    )
     if (is.null(all_8.5)) {
         all_8.5 <- medians_8.5
         all_4.5 <- medians_4.5
+        all_values <- medians
     } else {
         all_8.5 <- left_join(all_8.5, medians_8.5, by=c("Country", "Year"))
         all_4.5 <- left_join(all_4.5, medians_4.5, by=c("Country", "Year"))
+        all_values <- left_join(all_values, medians, by=c("Country","Year", "RCP"))
     }
 }
 # Finish Tidy - gather by data type
 final_8.5 <- gather(all_8.5, -c(Country, Year), key="Type", value="Value")
 final_4.5 <- gather(all_4.5, -c(Country, Year), key="Type", value="Value")
+final_values <- gather(all_values, -c(Country, Year, RCP), key="Type", value="Value")
 
 # Upload the data
-ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
-sheet_write(final_8.5, ss, sheet="RCP 8.5")
-sheet_write(final_4.5, ss, sheet="RCP 4.5")
+ss <- drive_get("Met Office Hackathon 2021/Sheets Testing v0")
+# sheet_write(final_8.5, ss, sheet="RCP 8.5")
+# sheet_write(final_4.5, ss, sheet="RCP 4.5")
+sheet_write(final_values, ss, sheet="Combined RCP")
