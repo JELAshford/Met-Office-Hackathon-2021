@@ -4,7 +4,7 @@ library(googledrive)
 library(tidyverse)
 library(openxlsx)
 
-YEARS = c("2020", "2040")
+YEARS = c("1986", "2020", "2040")
 
 # Load in UN Urbanisation data
 file = "rsc/WorldPopulation/WUP2018-F21-Proportion_Urban_Annual.xlsx"
@@ -13,21 +13,22 @@ clean <- urban.data %>%
     slice(10:n())
 colnames(clean) <- urban.data[9, ]
 
+# Read in row indexes of countries
+country_indexes = read_csv("rsc/WorldPopulation/urban_indexes.csv")
+
 # Extraction regions and colums of interest
 focus <- clean %>%
-    filter(Type == "Country/Area") %>%
-    filter(`Reference date (as of 1 July)` %in% YEARS) %>%
-    summarise(
-        Country = `Region, subregion, country or area *`,
-        Year = `Reference date (as of 1 July)`,
-        `% 65+` = `65+`
-    ) %>%
-    mutate(across(Year:`% 65+`, as.numeric))
+    filter(Index %in% unlist(country_indexes)) %>%
+    mutate(Country = `Region, subregion, country or area`) %>%
+    select(Country, YEARS) %>%
+    gather(YEARS, key="Year", value="% Urbanised") %>%
+    mutate(`% Urbanised` = round(`% Urbanised`, 3))
+
 
 # Basic plot
 p <- ggplot(focus) + 
-    geom_line(aes(x=Year, y=`% 65+`, group=Country))
+    geom_line(aes(x=Year, y=`% Urbanised`, group=Country))
 
 # Upload to drive
 ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
-sheet_write(focus, ss, sheet="% Pop 65+")
+sheet_write(focus, ss, sheet="% Urbanised")
