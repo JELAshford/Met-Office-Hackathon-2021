@@ -3,6 +3,7 @@ library(googlesheets4)
 library(googledrive)
 library(tidyverse)
 library(openxlsx)
+library(plotly)
 
 YEARS = c("1986", "2020", "2040")
 
@@ -21,14 +22,17 @@ focus <- clean %>%
     filter(Index %in% unlist(country_indexes)) %>%
     mutate(Country = `Region, subregion, country or area`) %>%
     select(Country, YEARS) %>%
+    # select(Country, `1950`:`2050`) %>%
     gather(YEARS, key="Year", value="% Urbanised") %>%
-    mutate(`% Urbanised` = round(`% Urbanised`, 3))
+    # gather(`1950`:`2050`, key="Year", value="% Urbanised") %>%
+    mutate(`% Urbanised` = round(as.numeric(`% Urbanised`), 3))
 
 
 # Basic plot
 p <- ggplot(focus) + 
-    geom_line(aes(x=Year, y=`% Urbanised`, group=Country))
+    geom_line(aes(x=Year, y=`% Urbanised`, group=Country)) + 
+    theme(axis.text.x = element_text(angle=90, size=5))
 
 # Upload to drive
-ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
-sheet_write(focus, ss, sheet="% Urbanised")
+# ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
+# sheet_write(focus, ss, sheet="% Urbanised")

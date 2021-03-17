@@ -81,7 +81,7 @@ final_4.5 <- subtract.1986(final_4.5)
 final_values <- subtract.1986(final_values)
 
 # Upload the data
-ss <- drive_get("Met Office Hackathon 2021/Sheets Testing v0")
-# sheet_write(final_8.5, ss, sheet="RCP 8.5_new")
-# sheet_write(final_4.5, ss, sheet="RCP 4.5_new")
-# sheet_write(final_values, ss, sheet="Combined RCP")
+ss <- drive_get("Met Office Hackathon 2021/Sheets Testing - Dynamic")
+sheet_write(final_8.5, ss, sheet="RCP 8.5")
+sheet_write(final_4.5, ss, sheet="RCP 4.5")
+sheet_write(final_values, ss, sheet="Combined RCP")
