@@ -13,6 +13,14 @@ extract.medians <- function(model.data, val.name) {
     return(out)
 }
 
+subtract.1986 <- function(tibble) {
+    out <- tibble %>%
+        mutate(combo = paste0(Country, Type)) %>%
+        mutate(target = Absolute[match(combo, combo[which(Year == "1986")])]) %>%
+        mutate(Value = as.numeric(Absolute) - as.numeric(target)) %>%
+        select(-combo, -target)
+}
+
 column_names = c(
     "Country",
     "1986_median",
@@ -63,12 +71,17 @@ for (sheet in cil.sheets) {
     }
 }
 # Finish Tidy - gather by data type
-final_8.5 <- gather(all_8.5, -c(Country, Year), key="Type", value="Value")
-final_4.5 <- gather(all_4.5, -c(Country, Year), key="Type", value="Value")
-final_values <- gather(all_values, -c(Country, Year, RCP), key="Type", value="Value")
+final_8.5 <- gather(all_8.5, -c(Country, Year), key="Type", value="Absolute")
+final_4.5 <- gather(all_4.5, -c(Country, Year), key="Type", value="Absolute")
+final_values <- gather(all_values, -c(Country, Year, RCP), key="Type", value="Absolute")
+
+# Subtract matching 1986 value
+final_8.5 <- subtract.1986(final_8.5)
+final_4.5 <- subtract.1986(final_4.5)
+final_values <- subtract.1986(final_values)
 
 # Upload the data
 ss <- drive_get("Met Office Hackathon 2021/Sheets Testing v0")
-# sheet_write(final_8.5, ss, sheet="RCP 8.5")
-# sheet_write(final_4.5, ss, sheet="RCP 4.5")
-sheet_write(final_values, ss, sheet="Combined RCP")
+# sheet_write(final_8.5, ss, sheet="RCP 8.5_new")
+# sheet_write(final_4.5, ss, sheet="RCP 4.5_new")
+# sheet_write(final_values, ss, sheet="Combined RCP")
