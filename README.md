@@ -12,7 +12,7 @@ We will be working on a visualisation of data from the United Nations Sustainabl
 *Power Sector Vulnerability*
 
 <p align = "center">
-  <img src="/images/poster.PNG" width="400" height="300"> 
+  <img src="/images/poster.PNG" width="700" height="400"> 
 </p>
 
 ###TODO: Include data rousces (EIA, CIL), add link to tableau
