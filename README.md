@@ -18,4 +18,5 @@ We will be working on a visualisation of data from the United Nations Sustainabl
 Data was visualised with a Tableau:
 https://public.tableau.com/profile/andres.alegria#!/vizhome/MET_v3/Story
 
-###TODO: Include data rousces (EIA, CIL), add link to tableau
+
+#TODO: Include data sources (EIA, CIL)
